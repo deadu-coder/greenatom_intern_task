@@ -10,14 +10,15 @@ let deleteLastElemBtn = id('delete_last_elem_btn');
 let listContainer = id('item_list_container');
 let itemList = localStorage.itemList ? JSON.parse(localStorage.itemList) : [];
 
+
 const renderList = () => {
-        listContainer.innerHTML = ``;
-        let completedItemHtml = '';
-        for (let i = 0; i <= itemList.length - 1; i++) {
+    listContainer.innerHTML = ``;
+    for (let i = 0; i <= itemList.length - 1; i++) {
+        if (!itemList[i].competedList) {
             listContainer.innerHTML += `
                 <div class="list-item">
                     <div class="item-name" id="${i}">
-                        ${itemList[i]}
+                        ${itemList[i].value}
                     </div>
                     <div class="item-actions">
                         <button onclick="completedItem(${i})">Complete</button>
@@ -26,17 +27,35 @@ const renderList = () => {
                     </div>
                 </div>
             `;
-
         }
+        else {
+            listContainer.innerHTML += `
+                <div class="list-item">
+                    <div class="item-name completed" id="${i}">
+                        ${itemList[i].value}
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="completedItem(${i})">Uncomplete</button>
+                        <button onclick="editItem(${i})">Изменить</button>
+                        <button onclick="deleteItem(${i})">Удалить</button>
+                    </div>
+                </div>
+            `;
+        }
+
+    }
 }
 
 const addEvent = () => {
     let value = input.value;
     if (value.length > 0) {
-        itemList.push(value);
+        let obj = {};
+        obj.value = value;
+        obj.competedList = false;
+        itemList.push(obj);
         input.value = "";
     } else {
-        alert("Please specify a name for your task");
+        alert("Пожалуйста заполните поле!");
     }
     localStorage.itemList = JSON.stringify(itemList);
     renderList();
@@ -55,29 +74,32 @@ const deleteItem = (index) => {
 const completedItem = (index) => {
     let item = itemList[index];
     let tmp = "";
-    let flag = true;
-    if (item != undefined) {
+    if (item != undefined && !item.competedList) {
+        item.competedList = true;
         tmp = item;
         itemList.splice(index, 1);
         itemList.push(tmp);
-        var elem = document.getElementById(index);
-        elem.classList.toggle("completed");
         localStorage.itemList = JSON.stringify(itemList);
-        renderList(flag);
+        renderList();
+    } else {
+        itemList.unshift(...itemList.splice(index, 1))
+        item.competedList = false;
+        renderList();
     }
 }
 
 const editItem = (index) => {
     let item = itemList[index];
+
     if (item != undefined) {
-        let ask = prompt(`Изменяем "${item}" на : `);
-        if (ask.length > 0) {
-            itemList[index] = ask;
-            localStorage.itemList = JSON.stringify(itemList);
+        let ask = prompt(`Изменяем "${item.value}" на : `);
+        if (ask.length > 0 && ask != null) {
+            itemList[index].value = ask;
+             localStorage.itemList = JSON.stringify(itemList);
             renderList();
         }
     } else {
-        alert("Item not available in list.");
+        alert("Элемент недоступен в списке.");
     }
 }
 
@@ -97,9 +119,8 @@ const oddItems = () => {
     for (var i = 0; i < itemList.length; i++) {
 
         if (((i + 1) % 2) !== 0) {
-            console.log(i);
             var elem = document.getElementById(i);
-            elem.style.backgroundColor = '#AA0000';
+            elem.style.backgroundColor = '#ADFF2F';
         }
     }
 }
@@ -125,19 +146,22 @@ addBtn.addEventListener("click", (e) => {
     e.preventDefault();
     addEvent();
 })
+
 honestBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     honestItem();
 })
 oddBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     oddItems();
 })
 deleteFirstElemBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     deleteFirstElem();
 })
 deleteLastElemBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     deleteLastElem();
 })
-
-
 
 renderList();
