@@ -3,7 +3,7 @@ const id = (x) => {
 }
 let input = id('input');
 let addBtn = id('add_btn');
-let honestBtn = id('honest_btn');
+let evenBtn = id('even_btn');
 let oddBtn = id('odd_btn');
 let deleteFirstElemBtn = id('delete_first_elem_btn');
 let deleteLastElemBtn = id('delete_last_elem_btn');
@@ -14,7 +14,7 @@ let itemList = localStorage.itemList ? JSON.parse(localStorage.itemList) : [];
 const renderList = () => {
     listContainer.innerHTML = ``;
     for (let i = 0; i <= itemList.length - 1; i++) {
-        if (!itemList[i].competedList) {
+        if (!itemList[i].completedList) {
             listContainer.innerHTML += `
                 <div class="list-item">
                     <div class="item-name" id="${i}">
@@ -45,15 +45,25 @@ const renderList = () => {
 
     }
 }
+Array.prototype.insert = function (index, item) {
+    this.splice(index, 0, item);
+};
 
 const addEvent = () => {
     let value = input.value;
+    let idx = 0;
     if (value.length > 0) {
-        let obj = {};
-        obj.value = value;
-        obj.competedList = false;
-        itemList.push(obj);
-        input.value = "";
+        for (let i = 0; i < itemList.length; i++) {
+            if (itemList[i].completedList == true) {
+                idx = i;
+                break;
+            } else {
+                idx = itemList.length;
+            }
+        }
+        let obj = { value: value, completedList: false };
+        itemList.insert(idx, obj);
+        input.value = '';
     } else {
         alert("Пожалуйста заполните поле!");
     }
@@ -63,7 +73,7 @@ const addEvent = () => {
 
 const deleteItem = (index) => {
     let item = itemList[index];
-    if (item != undefined) {
+    if (item != null) {
         itemList.splice(index, 1);
         localStorage.itemList = JSON.stringify(itemList);
         renderList();
@@ -71,11 +81,12 @@ const deleteItem = (index) => {
         alert("Элемент был успешно удален");
     }
 }
+
 const completedItem = (index) => {
     let item = itemList[index];
-    let tmp = "";
-    if (item != undefined && !item.competedList) {
-        item.competedList = true;
+    let tmp = '';
+    if (item != null && !item.completedList) {
+        item.completedList = true;
         tmp = item;
         itemList.splice(index, 1);
         itemList.push(tmp);
@@ -83,19 +94,19 @@ const completedItem = (index) => {
         renderList();
     } else {
         itemList.unshift(...itemList.splice(index, 1))
-        item.competedList = false;
+        item.completedList = false;
+        localStorage.itemList = JSON.stringify(itemList);
         renderList();
     }
 }
 
 const editItem = (index) => {
     let item = itemList[index];
-
-    if (item != undefined) {
+    if (item != null) {
         let ask = prompt(`Изменяем "${item.value}" на : `);
         if (ask.length > 0 && ask != null) {
             itemList[index].value = ask;
-             localStorage.itemList = JSON.stringify(itemList);
+            localStorage.itemList = JSON.stringify(itemList);
             renderList();
         }
     } else {
@@ -103,31 +114,26 @@ const editItem = (index) => {
     }
 }
 
-const honestItem = () => {
-
-    for (var i = 0; i < itemList.length; i++) {
-
+const evenItem = () => {
+    for (let i = 0; i < itemList.length; i++) {
         if (((i + 1) % 2) === 0) {
-            var elem = document.getElementById(i);
-            elem.style.backgroundColor = "#AA0000";
+            let elem = document.getElementById(i);
+            elem.classList.toggle("even_color");
         }
     }
 }
 
 const oddItems = () => {
-
-    for (var i = 0; i < itemList.length; i++) {
-
+    for (let i = 0; i < itemList.length; i++) {
         if (((i + 1) % 2) !== 0) {
-            var elem = document.getElementById(i);
-            elem.style.backgroundColor = '#ADFF2F';
+            let elem = document.getElementById(i);
+            elem.classList.toggle("odds_color");
         }
     }
 }
 
 const deleteFirstElem = () => {
-
-    if (itemList[0] != undefined) {
+    if (itemList[0] != null) {
         itemList.splice(0, 1);
         localStorage.itemList = JSON.stringify(itemList);
         renderList();
@@ -135,7 +141,7 @@ const deleteFirstElem = () => {
 }
 
 const deleteLastElem = () => {
-    if ((itemList.length - 1) != undefined) {
+    if ((itemList.length - 1) != null) {
         itemList.splice(itemList.length - 1, 1);
         localStorage.itemList = JSON.stringify(itemList);
         renderList();
@@ -147,9 +153,9 @@ addBtn.addEventListener("click", (e) => {
     addEvent();
 })
 
-honestBtn.addEventListener("click", (e) => {
+evenBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    honestItem();
+    evenItem();
 })
 oddBtn.addEventListener("click", (e) => {
     e.preventDefault();

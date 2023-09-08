@@ -49,3 +49,9 @@
 .completed {
     text-decoration: line-through;
 }
+.odds_color {
+    background-color: #ADFF2F;
+}
+.even_color {
+    background-color: #AA0000;
+}
