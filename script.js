@@ -104,10 +104,12 @@ const editItem = (index) => {
     let item = itemList[index];
     if (item != null) {
         let ask = prompt(`Изменяем "${item.value}" на : `);
-        if (ask.length > 0 && ask != null) {
-            itemList[index].value = ask;
-            localStorage.itemList = JSON.stringify(itemList);
-            renderList();
+        if (ask != null) {
+            if (ask.length > 0) {
+                itemList[index].value = ask;
+                localStorage.itemList = JSON.stringify(itemList);
+                renderList();
+            }
         }
     } else {
         alert("Элемент недоступен в списке.");
