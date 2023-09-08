@@ -45,9 +45,6 @@ const renderList = () => {
 
     }
 }
-Array.prototype.insert = function (index, item) {
-    this.splice(index, 0, item);
-};
 
 const addEvent = () => {
     let value = input.value;
@@ -62,7 +59,7 @@ const addEvent = () => {
             }
         }
         let obj = { value: value, completedList: false };
-        itemList.insert(idx, obj);
+        itemList.splice(idx, 0, obj);
         input.value = '';
     } else {
         alert("Пожалуйста заполните поле!");
